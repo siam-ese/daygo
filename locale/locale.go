@@ -1,31 +1,14 @@
 package locale
 
-const (
-	Monday    = "Monday"
-	Tuesday   = "Tuesday"
-	Wednesday = "Wednesday"
-	Thursday  = "Thursday"
-	Friday    = "Friday"
-	Saturday  = "Saturday"
-	Sunday    = "Sunday"
-	January   = "January"
-	February  = "February"
-	March     = "March"
-	April     = "April"
-	May       = "May"
-	June      = "June"
-	July      = "July"
-	August    = "August"
-	September = "September"
-	October   = "October"
-	November  = "November"
-	December  = "December"
-)
-
 type Translator struct {
-	Map map[string]string
+	WeekMap  [7]string
+	MonthMap [12]string
 }
 
-func (t *Translator) T(key string) string {
-	return t.Map[key]
+func (t *Translator) WT(key int) string {
+	return t.WeekMap[key]
+}
+
+func (t *Translator) MT(key int) string {
+	return t.MonthMap[key]
 }
