@@ -9,7 +9,7 @@ import (
 )
 
 type day struct {
-	time     time.Time
+	Time     time.Time
 	Year     int
 	Month    time.Month
 	Day      int
@@ -34,7 +34,7 @@ const (
 )
 
 func (d *day) fields() {
-	time := d.time
+	time := d.Time
 
 	d.Year = time.Year()
 	d.Month = time.Month()
@@ -42,14 +42,16 @@ func (d *day) fields() {
 	d.Hour = time.Hour()
 	d.Minute = time.Minute()
 	d.Second = time.Second()
-	d.Unix = time.UnixNano() / 1e6
-	d.UnixNano = time.UnixNano()
 	d.WeekDay = time.Weekday()
+
+	unixNano := time.UnixNano()
+	d.Unix = unixNano / 1e6
+	d.UnixNano = unixNano
 }
 
 func createDay(time time.Time) *day {
 	d := &day{
-		time: time,
+		Time: time,
 	}
 
 	d.fields()
@@ -78,18 +80,18 @@ func (d *day) change(value int, unit Unit) *day {
 
 	switch unit {
 	case Year:
-		return createDay(d.time.AddDate(value, 0, 0))
+		return createDay(d.Time.AddDate(value, 0, 0))
 	case Month:
 		month := int(d.Month) + value
-		return createDay(time.Date(d.Year, time.Month(month), monthDays(d.Year, month), d.Hour, d.Minute, d.Minute, d.SecondAfterUnixNano(), d.time.Location()))
+		return createDay(time.Date(d.Year, time.Month(month), monthDays(d.Year, month), d.Hour, d.Minute, d.Minute, d.SecondAfterUnixNano(), d.Time.Location()))
 	case Day:
-		return createDay(d.time.AddDate(0, 0, value))
+		return createDay(d.Time.AddDate(0, 0, value))
 	case Hour:
-		return createDay(d.time.Add(time.Duration(60 * 60 * value * sec)))
+		return createDay(d.Time.Add(time.Duration(60 * 60 * value * sec)))
 	case Minute:
-		return createDay(d.time.Add(time.Duration(60 * value * sec)))
+		return createDay(d.Time.Add(time.Duration(60 * value * sec)))
 	case Second:
-		return createDay(d.time.Add(time.Duration(value * sec)))
+		return createDay(d.Time.Add(time.Duration(value * sec)))
 	}
 
 	return d
@@ -260,11 +262,11 @@ func (d *day) Format(t string) string {
 }
 
 func (d *day) UTC() *day {
-	return createDay(d.time.UTC())
+	return createDay(d.Time.UTC())
 }
 
 func (d *day) Local() *day {
-	return createDay(d.time.Local())
+	return createDay(d.Time.Local())
 }
 
 func (d *day) StartOf(unit Unit) *day {
@@ -292,7 +294,7 @@ func (d *day) StartOf(unit Unit) *day {
 		day = d.Second
 	}
 
-	return createDay(time.Date(year, time.Month(month), day, hour, minute, second, 0, d.time.Location()))
+	return createDay(time.Date(year, time.Month(month), day, hour, minute, second, 0, d.Time.Location()))
 }
 
 func intInSlice(nums []int, num int) bool {
@@ -327,5 +329,5 @@ func (d *day) EndOf(unit Unit) *day {
 		second = d.Second
 	}
 
-	return createDay(time.Date(d.Year, time.Month(month), day, hour, minute, second, int(9e8), d.time.Location()))
+	return createDay(time.Date(d.Year, time.Month(month), day, hour, minute, second, int(9e8), d.Time.Location()))
 }
