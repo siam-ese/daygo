@@ -1,25 +1,24 @@
 package day
 
 import (
-	"day/template"
 	"errors"
 	"fmt"
-	"log"
 	"regexp"
 	"strconv"
 	"time"
 )
 
 type day struct {
-	time    time.Time
-	Year    int
-	Month   time.Month
-	Day     int
-	Hour    int
-	Minute  int
-	Second  int
-	Unix    int64
-	WeekDay time.Weekday
+	time     time.Time
+	Year     int
+	Month    time.Month
+	Day      int
+	Hour     int
+	Minute   int
+	Second   int
+	Unix     int64
+	UnixNano int64
+	WeekDay  time.Weekday
 }
 
 type Unit = int
@@ -44,6 +43,7 @@ func (d *day) fields() {
 	d.Minute = time.Minute()
 	d.Second = time.Second()
 	d.Unix = time.UnixNano() / 1e6
+	d.UnixNano = time.UnixNano()
 	d.WeekDay = time.Weekday()
 }
 
@@ -56,13 +56,32 @@ func createDay(time time.Time) *day {
 	return d
 }
 
+func monthDays(year int, month int) int {
+	leapMonth := []int{1, 3, 5, 7, 8, 10, 12}
+	if month == 2 {
+		if IsLeapYear(year) {
+			return 29
+		} else {
+			return 28
+		}
+	} else if intInSlice(leapMonth, month) {
+		return 31
+	} else {
+		return 30
+	}
+}
+
+// change day date-time with value or unit
+// value might int or -int
 func (d *day) change(value int, unit Unit) *day {
-	sec := int(1e9)
+	sec := int(time.Second)
+
 	switch unit {
 	case Year:
 		return createDay(d.time.AddDate(value, 0, 0))
 	case Month:
-		return createDay(d.time.AddDate(0, value, 0))
+		month := int(d.Month) + value
+		return createDay(time.Date(d.Year, time.Month(month), monthDays(d.Year, month), d.Hour, d.Minute, d.Minute, d.SecondAfterUnixNano(), d.time.Location()))
 	case Day:
 		return createDay(d.time.AddDate(0, 0, value))
 	case Hour:
@@ -98,7 +117,7 @@ func Format(t string) (*day, error) {
 
 	year, month, day, hour, minute, second := parseList(list)
 
-	return createDay(time.Date(year, time.Month(month), day, hour, minute, second, 0, time.UTC)), nil
+	return createDay(time.Date(year, time.Month(month), day, hour, minute, second, 0, time.Local)), nil
 
 }
 
@@ -119,7 +138,11 @@ func Unix(unix int) (*day, error) {
 
 func List(list []int) *day {
 	year, month, day, hour, minute, second := parseList(list)
-	return createDay(time.Date(year, time.Month(month), day, hour, minute, second, 0, time.UTC))
+	return createDay(time.Date(year, time.Month(month), day, hour, minute, second, 0, time.Local))
+}
+
+func IsLeapYear(year int) bool {
+	return time.Date(year, time.Month(12), 31, 0, 0, 0, 0, time.Local).YearDay() == 366
 }
 
 func (d *day) Set(value int, unit Unit) *day {
@@ -173,29 +196,136 @@ func (d *day) SetWeekDay(value int) *day {
 	return d.Set(value, WeekDay)
 }
 
+func (d *day) SecondAfterUnixNano() int {
+	str := fmt.Sprintf("%v", d.UnixNano)
+	ret, _ := strconv.Atoi(str[len(str)-9:])
+
+	return ret
+}
+
+func fillZero(value int) string {
+	if value < 10 {
+		return fmt.Sprintf("0%v", value)
+	} else {
+		return fmt.Sprintf("%v", value)
+	}
+}
+
 func (d *day) Format(t string) string {
-	c := regexp.MustCompile(`/\[([^\]]+)]|Y{1,4}|M{1,4}|D{1,2}|d{1,4}|H{1,2}|h{1,2}|a|A|m{1,2}|s{1,2}|Z{1,2}|SSS/g`)
+	c := regexp.MustCompile(`/\[([^\]]+)]|Y{1,4}|M{1,4}|D{1,2}|d{1,4}|H{1,2}|h{1,2}|m{1,2}|s{1,2}|Z{1,2}|SSS/g`)
 
 	ret := c.ReplaceAllStringFunc(t, func(substr string) string {
 		switch substr {
-		case template.Year:
+		case "YYYY":
 			return fmt.Sprintf("%v", d.Year)
-		case template.Month:
+		case "YY":
+			year := fmt.Sprintf("%v", d.Year)
+			return year[len(year)-2:]
+		case "M":
 			return fmt.Sprintf("%v", int(d.Month))
-		case template.Day:
+		case "MM":
+			return fillZero(int(d.Month))
+		case "D":
 			return fmt.Sprintf("%v", d.Day)
-		case template.Hour12:
+		case "DD":
+			return fillZero(d.Day)
+		case "h":
 			return fmt.Sprintf("%v", d.Hour%12)
-		case template.Hour24:
+		case "hh":
+			return fillZero(d.Hour % 12)
+		case "H":
 			return fmt.Sprintf("%v", d.Hour)
-		case template.Minute:
+		case "HH":
+			return fillZero(d.Hour)
+		case "m":
 			return fmt.Sprintf("%v", d.Minute)
-		case template.Second:
+		case "mm":
+			return fillZero(d.Minute)
+		case "s":
 			return fmt.Sprintf("%v", d.Second)
+		case "ss":
+			return fillZero(d.Second)
+		case "SSS":
+			return fmt.Sprintf("%v", d.Unix)
+		case "d":
+			return fmt.Sprintf("%v", int(d.WeekDay))
+		case "dd":
+			return fmt.Sprintf("%v", d.WeekDay)
 		}
 
-		return ""
+		return substr
 	})
-	log.Println("format result:", ret)
+
 	return ret
+}
+
+func (d *day) UTC() *day {
+	return createDay(d.time.UTC())
+}
+
+func (d *day) Local() *day {
+	return createDay(d.time.Local())
+}
+
+func (d *day) StartOf(unit Unit) *day {
+	var year = d.Year
+	var (
+		month,
+		day,
+		hour,
+		minute,
+		second int
+	)
+	if unit >= Month {
+		month = int(d.Month)
+	}
+	if unit >= Day {
+		day = d.Day
+	}
+	if unit >= Hour {
+		day = d.Hour
+	}
+	if unit >= Minute {
+		day = d.Minute
+	}
+	if unit >= Second {
+		day = d.Second
+	}
+
+	return createDay(time.Date(year, time.Month(month), day, hour, minute, second, 0, d.time.Location()))
+}
+
+func intInSlice(nums []int, num int) bool {
+	for _, n := range nums {
+		if n == num {
+			return true
+		}
+	}
+	return false
+}
+
+func (d *day) EndOf(unit Unit) *day {
+	month := 12
+	day := 31
+	hour := 23
+	minute := 59
+	second := 59
+
+	if unit >= Month {
+		month = int(d.Month)
+	}
+	if unit >= Day {
+		day = monthDays(d.Year, month)
+	}
+	if unit >= Hour {
+		hour = d.Hour
+	}
+	if unit >= Minute {
+		minute = d.Minute
+	}
+	if unit >= Second {
+		second = d.Second
+	}
+
+	return createDay(time.Date(d.Year, time.Month(month), day, hour, minute, second, int(9e8), d.time.Location()))
 }
