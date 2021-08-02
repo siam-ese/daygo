@@ -7,10 +7,19 @@ import (
 	"time"
 )
 
-func ErrorF(method string) func(interface{}) string {
-	t := `[%s] test failed, params: %v`
-	return func(vals interface{}) string {
-		return fmt.Sprintf(t, method, vals)
+func ErrorF(method string) func(...interface{}) string {
+	t := `[%s] test failed`
+	return func(vals ...interface{}) string {
+		vals = append(vals, method)
+		if len(vals) > 0 {
+			t += ",params: ("
+			for i := 0; i < len(vals)-1; i++ {
+				t += "%s, "
+			}
+			t += ")"
+		}
+
+		return fmt.Sprintf(t, vals...)
 	}
 }
 
@@ -19,7 +28,7 @@ func TestNow(t *testing.T) {
 
 	d := Now()
 	if d.Day != time.Now().Day() {
-		t.Error(f(""))
+		t.Error(f())
 	}
 }
 
@@ -252,22 +261,22 @@ func TestDaySet(t *testing.T) {
 	d, _ := Format("2021-02-17 10:23:20")
 	f := ErrorF("Day.Set")
 	if d.Set(2024, Year).Year != 2024 {
-		t.Error(f(""), "Set Year")
+		t.Error(f(), "Set Year")
 	}
 	if d.Set(3, Month).Month != 3 {
-		t.Error(f(""), "Set Month")
+		t.Error(f(), "Set Month")
 	}
 	if d.Set(29, Day).Day != 1 {
-		t.Error(f(""), "Set Day")
+		t.Error(f(), "Set Day")
 	}
 	if d.Set(3, Hour).Hour != 3 {
-		t.Error(f(""), "Set Month")
+		t.Error(f(), "Set Month")
 	}
 	if d.Set(1, Minute).Minute != 1 {
-		t.Error(f(""), "Set Minute")
+		t.Error(f(), "Set Minute")
 	}
 	if d.Set(59, Second).Second != 59 {
-		t.Error(f(""), "Set Second")
+		t.Error(f(), "Set Second")
 	}
 }
 

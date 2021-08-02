@@ -1,11 +1,12 @@
 package day
 
 import (
-	"day/locale"
 	"errors"
 	"fmt"
 	"strconv"
 	"time"
+
+	"github.com/siam-ese/daygo/locale"
 )
 
 /**
