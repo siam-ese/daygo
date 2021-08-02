@@ -4,10 +4,11 @@ import (
 	"regexp"
 )
 
-func parseT(t string) []string {
-	c := regexp.MustCompile(`^(\d{4})[-\/]?(\d{1,2})?[-\/]?(\d{0,2})[Tt\s]*(\d{1,2})?:?(\d{1,2})?:?(\d{1,2})?[.:]?(\d+)?$`)
+var templateRe = regexp.MustCompile(`^(\d{4})[-\/]?(\d{1,2})?[-\/]?(\d{0,2})[Tt\s]*(\d{1,2})?:?(\d{1,2})?:?(\d{1,2})?[.:]?(\d+)?$`)
+var formatRe = regexp.MustCompile(`/\[([^\]]+)]|Y{1,4}|M{1,4}|D{1,2}|d{1,4}|H{1,2}|h{1,2}|m{1,2}|s{1,2}|Z{1,2}|SSS/g`)
 
-	ret := c.FindStringSubmatch(t)
+func parseT(t string) []string {
+	ret := templateRe.FindStringSubmatch(t)
 
 	if len(ret) <= 0 {
 		return nil
