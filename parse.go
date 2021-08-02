@@ -5,7 +5,8 @@ import (
 )
 
 var templateRe = regexp.MustCompile(`^(\d{4})[-\/]?(\d{1,2})?[-\/]?(\d{0,2})[Tt\s]*(\d{1,2})?:?(\d{1,2})?:?(\d{1,2})?[.:]?(\d+)?$`)
-var formatRe = regexp.MustCompile(`/\[([^\]]+)]|Y{1,4}|M{1,4}|D{1,2}|d{1,4}|H{1,2}|h{1,2}|m{1,2}|s{1,2}|Z{1,2}|SSS/g`)
+var formatRe = regexp.MustCompile(`/\[([^\]]+)]|Y{1,4}|M{1,4}|D{1,2}|d{1,2}|H{1,2}|h{1,2}|m{1,2}|s{1,2}|Z{1,2}|SSS/g`)
+var duraFormatRe = regexp.MustCompile(`/\[([^\]]+)]|Y|M|D|H|m|s/g`)
 
 func parseT(t string) []string {
 	ret := templateRe.FindStringSubmatch(t)
@@ -22,12 +23,19 @@ func parseList(list []int) (year, month, day, hour, minute, second int) {
 	if l > 0 {
 		year = list[0]
 	}
+
 	if l > 1 {
 		month = list[1]
+	} else {
+		month = 1
 	}
+
 	if l > 2 {
 		day = list[2]
+	} else {
+		day = 1
 	}
+
 	if l > 3 {
 		hour = list[3]
 	}

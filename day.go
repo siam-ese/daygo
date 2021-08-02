@@ -8,7 +8,11 @@ import (
 	"time"
 )
 
-type day struct {
+/**
+day.D package mainly type
+contains mostly method
+*/
+type D struct {
 	time     time.Time
 	Year     int
 	Month    time.Month
@@ -23,6 +27,7 @@ type day struct {
 
 type Unit = int
 
+// day bulit-in unit-type, use in Add, Subtract, Set, EndOf, StartOf methods
 const (
 	Year Unit = iota
 	Month
@@ -39,7 +44,7 @@ func init() {
 	translator = locale.EN
 }
 
-func (d *day) fields() {
+func (d *D) fields() {
 	time := d.time
 
 	d.Year = time.Year()
@@ -55,8 +60,8 @@ func (d *day) fields() {
 	d.UnixNano = unixNano
 }
 
-func createDay(time time.Time) *day {
-	d := &day{
+func createDay(time time.Time) *D {
+	d := &D{
 		time: time,
 	}
 
@@ -64,6 +69,7 @@ func createDay(time time.Time) *day {
 	return d
 }
 
+// get maximum days by year and month
 func MonthDay(year int, month int) int {
 	leapMonth := []int{1, 3, 5, 7, 8, 10, 12}
 	if month == 2 {
@@ -79,13 +85,18 @@ func MonthDay(year int, month int) int {
 	}
 }
 
-func (d *day) Time() time.Time {
+// set translator of day, day/locale has zh-cn or en, default: en
+func Locale(t locale.Translator) {
+	translator = t
+}
+
+func (d *D) Time() time.Time {
 	return d.time
 }
 
-// change day date-time with value or unit
+// change Day date-time with value or unit
 // value might int or -int
-func (d *day) change(value int, unit Unit) *day {
+func (d *D) change(value int, unit Unit) *D {
 	sec := int(time.Second)
 
 	switch unit {
@@ -107,18 +118,21 @@ func (d *day) change(value int, unit Unit) *day {
 	return d
 }
 
-func New(time time.Time) *day {
+// use time.Time create a new day.D
+func New(time time.Time) *D {
 	return createDay(time)
 }
 
-func Now() *day {
+// use time.Now create a new day.D
+func Now() *D {
 	return createDay(time.Now())
 }
 
-func Format(t string) (*day, error) {
+// parse ISO date-time-string, use parse result create a new day.D
+func Format(t string) (*D, error) {
 	ret := parseT(t)
 	if ret == nil {
-		return nil, errors.New("format parse failed")
+		return nil, fmt.Errorf("formt failed: Could not parse string %s", t)
 	}
 
 	var list []int
@@ -127,14 +141,14 @@ func Format(t string) (*day, error) {
 		list = append(list, val)
 	}
 
-	year, month, day, hour, minute, second := parseList(list)
+	year, month, Day, hour, minute, second := parseList(list)
 
-	return createDay(time.Date(year, time.Month(month), day, hour, minute, second, 0, time.Local)), nil
+	return createDay(time.Date(year, time.Month(month), Day, hour, minute, second, 0, time.Local)), nil
 
 }
 
-func Unix(unix int) (*day, error) {
-
+// use millisecond create a new day.D
+func Unix(unix int) (*D, error) {
 	unixStr := fmt.Sprintf("%v", unix)
 	if len(unixStr) != 13 {
 		return nil, errors.New("unix is 13 bit milliseconds")
@@ -148,16 +162,22 @@ func Unix(unix int) (*day, error) {
 	return createDay(time.Unix(sec, int64(nsec))), nil
 }
 
-func List(list []int) *day {
-	year, month, day, hour, minute, second := parseList(list)
-	return createDay(time.Date(year, time.Month(month), day, hour, minute, second, 0, time.Local))
+// use int slice creat a new day.D, unset items use default value
+// parameter: list int[year, month, day, hour, minute, second]
+// example: List([]int{2021, 8, 17}) => day.D year: 2021, month: 8, day: 17, hour: 0, minute: 0, second: 0
+func List(list []int) *D {
+	year, month, Day, hour, minute, second := parseList(list)
+	return createDay(time.Date(year, time.Month(month), Day, hour, minute, second, 0, time.Local))
 }
 
+// judge year is leap year
 func IsLeapYear(year int) bool {
 	return year%400 == 0 || (year%4 == 0 && year%100 != 0)
 }
 
-func (d *day) Set(value int, unit Unit) *day {
+// set value by specific unit
+// example: D.set(2020, day.Year) // set year to 2020
+func (d *D) Set(value int, unit Unit) *D {
 	switch unit {
 	case Year:
 		return d.change(value-d.Year, Year)
@@ -178,37 +198,43 @@ func (d *day) Set(value int, unit Unit) *day {
 	return d
 }
 
-func (d *day) Add(value int, unit Unit) *day {
+// add value by specific unit
+// example: List([]int{2020}).Add(2, day.Year) // 2020 year add to 2022 year
+func (d *D) Add(value int, unit Unit) *D {
 	return d.change(value, unit)
 }
 
-func (d *day) Subtract(value int, unit Unit) *day {
+// add value by specific unit
+// example: List([]int{2020}).Subtract(2, day.Year) // 2020 year sub to 2018 year
+func (d *D) Subtract(value int, unit Unit) *D {
 	return d.change(-value, unit)
 }
 
-func (d *day) SetYear(value int) *day {
+func (d *D) SetYear(value int) *D {
 	return d.Set(value, Year)
 }
-func (d *day) SetMonth(value int) *day {
+func (d *D) SetMonth(value int) *D {
 	return d.Set(value, Month)
 }
-func (d *day) SetDay(value int) *day {
+func (d *D) SetDay(value int) *D {
 	return d.Set(value, Day)
 }
-func (d *day) SetMinute(value int) *day {
+func (d *D) SetMinute(value int) *D {
 	return d.Set(value, Minute)
 }
-func (d *day) SetHour(value int) *day {
+func (d *D) SetHour(value int) *D {
 	return d.Set(value, Hour)
 }
-func (d *day) SetSecond(value int) *day {
+func (d *D) SetSecond(value int) *D {
 	return d.Set(value, Second)
 }
-func (d *day) SetWeekDay(value int) *day {
+func (d *D) SetWeekDay(value int) *D {
 	return d.Set(value, WeekDay)
 }
 
-func (d *day) SecondAfterUnixNano() int {
+// slice second after 9 bit unixnano
+// example: 1627637214-376669500 => 376669500 return unixnano
+func (d *D) SecondAfterUnixNano() int {
 	str := fmt.Sprintf("%v", d.UnixNano)
 	ret, _ := strconv.Atoi(str[len(str)-9:])
 
@@ -223,7 +249,7 @@ func fillZero(value int) string {
 	}
 }
 
-func (d *day) Format(t string) string {
+func (d *D) Format(t string) string {
 	ret := formatRe.ReplaceAllStringFunc(t, func(substr string) string {
 		switch substr {
 		case "YYYY":
@@ -269,40 +295,14 @@ func (d *day) Format(t string) string {
 	return ret
 }
 
-func (d *day) UTC() *day {
+// return current day.D from UTC time
+func (d *D) UTC() *D {
 	return createDay(d.time.UTC())
 }
 
-func (d *day) Local() *day {
+// return  current day.D from local time
+func (d *D) Local() *D {
 	return createDay(d.time.Local())
-}
-
-func (d *day) StartOf(unit Unit) *day {
-	var year = d.Year
-	var (
-		month,
-		day,
-		hour,
-		minute,
-		second int
-	)
-	if unit >= Month {
-		month = int(d.Month)
-	}
-	if unit >= Day {
-		day = d.Day
-	}
-	if unit >= Hour {
-		day = d.Hour
-	}
-	if unit >= Minute {
-		day = d.Minute
-	}
-	if unit >= Second {
-		day = d.Second
-	}
-
-	return createDay(time.Date(year, time.Month(month), day, hour, minute, second, 0, d.time.Location()))
 }
 
 func intInSlice(nums []int, num int) bool {
@@ -314,18 +314,23 @@ func intInSlice(nums []int, num int) bool {
 	return false
 }
 
-func (d *day) EndOf(unit Unit) *day {
-	month := 12
-	day := 31
-	hour := 23
-	minute := 59
-	second := 59
+// set date-time startOf special unit
+func (d *D) StartOf(unit Unit) *D {
+	year := d.Year
+	month := 1
+	day := 1
+
+	var (
+		hour,
+		minute,
+		second int
+	)
 
 	if unit >= Month {
 		month = int(d.Month)
 	}
 	if unit >= Day {
-		day = MonthDay(d.Year, month)
+		day = d.Day
 	}
 	if unit >= Hour {
 		hour = d.Hour
@@ -337,5 +342,42 @@ func (d *day) EndOf(unit Unit) *day {
 		second = d.Second
 	}
 
-	return createDay(time.Date(d.Year, time.Month(month), day, hour, minute, second, int(9e8), d.time.Location()))
+	return createDay(time.Date(year, time.Month(month), day, hour, minute, second, 0, d.time.Location()))
+}
+
+// set date-time endOf special unit
+func (d *D) EndOf(unit Unit) *D {
+	month := 12
+	day := MonthDay(d.Year, month)
+	hour := 23
+	minute := 59
+	second := 59
+
+	if unit >= Month {
+		month = int(d.Month)
+	}
+	if unit >= Day {
+		day = d.Day
+	}
+	if unit >= Hour {
+		hour = d.Hour
+	}
+	if unit >= Minute {
+		minute = d.Minute
+	}
+	if unit >= Second {
+		second = d.Second
+	}
+
+	return createDay(time.Date(d.Year, time.Month(month), day, hour, minute, second, 999999999, d.time.Location()))
+}
+
+// returun days for month
+func (d *D) DaysInMonth() int {
+	return MonthDay(d.Year, int(d.Month))
+}
+
+// a.From(b) return a time.Duration, a.time sub b.time
+func (d *D) From(d2 *D) time.Duration {
+	return d.time.Sub(d2.time)
 }
