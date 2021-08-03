@@ -186,6 +186,28 @@ D.StartOf(daygo.Second)
 D.EndOf(daygo.Second)
 ```
 
+### D.DaysInMonth()
+
+Get days by day.D current Month
+
+```go
+// time 2021-08
+D.DaysInMonth() // 31
+// time 2021-02
+D.DaysInMonth() // 28
+
+```
+
+### From(b day.D) time.Duration
+
+return a time.Duration by current day.D sub b-day.D
+
+```go
+a := daygo.Now()
+b := daygo.Now().Subtract(1, daygo.Minute)
+a.From(b) // a - b, return time.Duration
+```
+
 ### D.UTC()
 
 ### D.Local()

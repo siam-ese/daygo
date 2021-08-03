@@ -329,3 +329,21 @@ func TestDaySecondAfterUnixNano(t *testing.T) {
 		t.Error("SecondAfterUnixNano test failed")
 	}
 }
+
+func TestDayDaysInMonth(t *testing.T) {
+	d1 := List([]int{2021, 8})
+	d2 := List([]int{2021, 2})
+	d3 := List([]int{2020, 2})
+	f := ErrorF("day.DaysInMonth")
+
+	if d1.DaysInMonth() != 31 {
+		t.Error(f(), "2021, 8")
+	}
+	if d2.DaysInMonth() != 28 {
+		t.Error(f(), "2021, 2")
+	}
+	if d3.DaysInMonth() != 29 {
+		t.Error(f(), "2020, 2")
+	}
+
+}
