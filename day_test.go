@@ -370,7 +370,10 @@ func TestDayUTCAndLocal(t *testing.T) {
 	f := ErrorF("day.UTC,day.Local")
 	u := Now().UTC()
 	l := Now().Local()
-	if l.Hour-u.Hour != 8 {
+	if u.time.Hour() != time.Now().UTC().Hour() {
+		t.Error(f())
+	}
+	if l.time.Hour() != time.Now().Local().Hour() {
 		t.Error(f())
 	}
 }
