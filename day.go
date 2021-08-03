@@ -102,7 +102,8 @@ func (d *D) change(value int, unit Unit) *D {
 
 	switch unit {
 	case Year:
-		return createDay(d.time.AddDate(value, 0, 0))
+		day := MonthDay(d.Year+value, int(d.Month))
+		return createDay(d.time.AddDate(value, 0, day-d.Day))
 	case Month:
 		month := int(d.Month) + value
 		return createDay(time.Date(d.Year, time.Month(month), MonthDay(d.Year, month), d.Hour, d.Minute, d.Minute, d.SecondAfterUnixNano(), d.time.Location()))

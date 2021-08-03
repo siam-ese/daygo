@@ -84,6 +84,15 @@ func TestDayAdd(t *testing.T) {
 	if d.Add(1, Second).Second != 0 { // 59 + 1 = 1m0s
 		t.Error(f(p1), "Add 1 Second")
 	}
+
+	d2 := List([]int{2020, 1, 31})
+	if d2.Add(1, Month).Day != 29 {
+		t.Error(f("2020, 1, 31"))
+	}
+	d3 := List([]int{2020, 2, 29})
+	if d3.Add(1, Year).Day != 28 {
+		t.Error(f("2020, 2, 29"))
+	}
 }
 
 func TestDaySubtract(t *testing.T) {
@@ -108,6 +117,11 @@ func TestDaySubtract(t *testing.T) {
 	}
 	if d.Subtract(1, Second).Second != 59 { // 59 + 1 = 1m0s
 		t.Error(f(p1), "Add 1 Second")
+	}
+
+	d3 := List([]int{2021, 3, 31})
+	if d3.Subtract(1, Month).Day != 28 {
+		t.Error(f("2021, 3, 31"))
 	}
 }
 
