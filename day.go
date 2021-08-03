@@ -262,6 +262,8 @@ func (d *D) Format(t string) string {
 			return fmt.Sprintf("%v", int(d.Month))
 		case "MM":
 			return fillZero(int(d.Month))
+		case "MMMM":
+			return translator.MT(int(d.Month))
 		case "D":
 			return fmt.Sprintf("%v", d.Day)
 		case "DD":
@@ -283,7 +285,8 @@ func (d *D) Format(t string) string {
 		case "ss":
 			return fillZero(d.Second)
 		case "SSS":
-			return fmt.Sprintf("%v", d.Unix)
+			unixStr := fmt.Sprint(d.Unix)
+			return unixStr[len(unixStr)-3:]
 		case "d":
 			return fmt.Sprintf("%v", int(d.WeekDay))
 		case "dd":

@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/siam-ese/daygo/locale"
 )
 
 func ErrorF(method string) func(...interface{}) string {
@@ -112,10 +114,26 @@ func TestDayFormat(t *testing.T) {
 	d, _ := Format("2021-07-30 10:23:59")
 	f := ErrorF("Day.Format")
 	p1 := "YYYY年MM月DD日，HH时mm分ss秒"
-	str := d.Format(p1)
-	if str != "2021年07月30日，10时23分59秒" {
+	if d.Format(p1) != "2021年07月30日，10时23分59秒" {
 		t.Error(f(p1))
 	}
+
+	p2 := "SSS,MMMM,dd"
+	if d.Format(p2) != "000,July,Friday" {
+		t.Error(f(p2))
+	}
+}
+
+func TestLocale(t *testing.T) {
+	Locale(locale.ZH_CN)
+	f := ErrorF("Locale")
+	d, _ := Format("2021-07-30 10:23:59")
+	p1 := "MMMM,dd"
+
+	if d.Format(p1) != "七月,星期五" {
+		t.Error(f(p1))
+	}
+
 }
 
 func TestDayStartOf(t *testing.T) {
