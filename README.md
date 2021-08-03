@@ -33,13 +33,13 @@ Get a day.D by time.Time
 daygo.New(time.Time)
 ```
 
-### Format(string)
+### Parse(string)
 
 Get a day.D by [ISO](https://zh.wikipedia.org/zh-tw/ISO_8601) format string
 
 ```go
-day.Format(`2021-08-02T05:53:12`)
-day.Format(`20210802T055312`)
+daygo.Parse(`2021-08-02T05:53:12`)
+daygo.Parse(`20210802T055312`)
 ```
 
 ### List([]int)
@@ -48,8 +48,8 @@ Get a day.D by int list, default values are used for unset items
 
 ```go
 // [year is required, month = 1, day = 1, hour = 0, minute = 0, second = 0]
-day.List([2021, 8]) // 2021-8-1 00:00:00
-day.List([2021, 8, 2, 19, 13, 54])
+daygo.List([2021, 8]) // 2021-8-1 00:00:00
+daygo.List([2021, 8, 2, 19, 13, 54])
 ```
 
 ### Unix(millisecond int)

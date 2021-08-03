@@ -130,7 +130,7 @@ func Now() *D {
 }
 
 // parse ISO date-time-string, use parse result create a new day.D
-func Format(t string) (*D, error) {
+func Parse(t string) (*D, error) {
 	ret := parseT(t)
 	if ret == nil {
 		return nil, fmt.Errorf("formt failed: Could not parse string %s", t)

@@ -34,10 +34,10 @@ func TestNow(t *testing.T) {
 	}
 }
 
-func TestFormat(t *testing.T) {
-	f := ErrorF("Format")
+func TestParse(t *testing.T) {
+	f := ErrorF("Parse")
 	p1 := "2021-07-28 12:26:36"
-	d, _ := Format(p1)
+	d, _ := Parse(p1)
 
 	if d.Year != 2021 {
 		t.Error(f(p1))
@@ -61,7 +61,7 @@ func TestUnix(t *testing.T) {
 
 func TestDayAdd(t *testing.T) {
 	p1 := "2021-01-31 19:02:59"
-	d, _ := Format(p1)
+	d, _ := Parse(p1)
 
 	f := ErrorF("Day.Add")
 	if d.Add(1, Year).Year != 2022 {
@@ -87,7 +87,7 @@ func TestDayAdd(t *testing.T) {
 
 func TestDaySubtract(t *testing.T) {
 	p1 := "2021-01-31 19:02:00"
-	d, _ := Format(p1)
+	d, _ := Parse(p1)
 
 	f := ErrorF("Day.Subtract")
 	if d.Subtract(1, Year).Year != 2020 {
@@ -111,8 +111,8 @@ func TestDaySubtract(t *testing.T) {
 }
 
 func TestDayFormat(t *testing.T) {
-	d, _ := Format("2021-07-30 10:23:59")
-	f := ErrorF("Day.Format")
+	d, _ := Parse("2021-07-30 10:23:59")
+	f := ErrorF("Day.Parse")
 	p1 := "YYYY年MM月DD日，HH时mm分ss秒"
 	if d.Format(p1) != "2021年07月30日，10时23分59秒" {
 		t.Error(f(p1))
@@ -127,7 +127,7 @@ func TestDayFormat(t *testing.T) {
 func TestLocale(t *testing.T) {
 	Locale(locale.ZH_CN)
 	f := ErrorF("Locale")
-	d, _ := Format("2021-07-30 10:23:59")
+	d, _ := Parse("2021-07-30 10:23:59")
 	p1 := "MMMM,dd"
 
 	if d.Format(p1) != "七月,星期五" {
@@ -137,7 +137,7 @@ func TestLocale(t *testing.T) {
 }
 
 func TestDayStartOf(t *testing.T) {
-	d, _ := Format("2021-07-30 10:23:59")
+	d, _ := Parse("2021-07-30 10:23:59")
 
 	sfYear := d.StartOf(Year)
 	if !(sfYear.Year == 2021 &&
@@ -206,7 +206,7 @@ func TestDayStartOf(t *testing.T) {
 }
 
 func TestDayEndOf(t *testing.T) {
-	d, _ := Format("2021-07-30 10:23:20")
+	d, _ := Parse("2021-07-30 10:23:20")
 
 	ef := d.EndOf(Year)
 	if !(ef.Year == 2021 &&
@@ -276,7 +276,7 @@ func TestDayEndOf(t *testing.T) {
 }
 
 func TestDaySet(t *testing.T) {
-	d, _ := Format("2021-02-17 10:23:20")
+	d, _ := Parse("2021-02-17 10:23:20")
 	f := ErrorF("Day.Set")
 	if d.Set(2024, Year).Year != 2024 {
 		t.Error(f(), "Set Year")
