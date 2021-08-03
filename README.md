@@ -70,11 +70,12 @@ Set translator to daygo
 import daygo
 import daygo/locale
 
-daygo.Locale(locale.EN)
+daygo.Locale(locale.EN) // default
+daygo.Locale(locale.ZH_CN)
 // create your translator
 customTranslator = locale.Translator{
-    WeekMap: int[7]
-    MonthMap: int[12]
+    WeekMap: [7]string{"monday"}
+    MonthMap: [12]string{"january"}
 }
 daygo.Locale(customTranslator)
 ```
