@@ -93,7 +93,7 @@ type D struct {
 	Second   int
 	Unix     int64 // millisecond
 	UnixNano int64
-	WeekDay  time.Weekday
+	Weekday  time.Weekday
 }
 ```
 
@@ -118,7 +118,7 @@ D.Add(1, daygo.Day)
 D.Add(1, daygo.Hour)
 D.Add(1, daygo.Minute)
 D.Add(1, daygo.Second)
-D.Add(1, daygo.WeekDay) // Monday -> Tuesday, if Sunday Add 1 to Monday
+D.Add(1, daygo.Weekday) // Monday -> Tuesday, if Sunday Add 1 to Monday
 
 D.Subtract(1, daygo.Year)
 D.Subtract(1, daygo.Month)
@@ -126,7 +126,7 @@ D.Subtract(1, daygo.Day)
 D.Subtract(1, daygo.Hour)
 D.Subtract(1, daygo.Minute)
 D.Subtract(1, daygo.Second)
-D.Subtract(1, daygo.WeekDay)
+D.Subtract(1, daygo.Weekday)
 
 D.Set(2020, daygo.Year) // set year to 2020
 D.Set(1, daygo.Month)
@@ -134,7 +134,7 @@ D.Set(1, daygo.Day)
 D.Set(1, daygo.Hour)
 D.Set(1, daygo.Minute)
 D.Set(1, daygo.Second)
-D.Set(1, daygo.WeekDay)
+D.Set(1, daygo.Weekday)
 // set method alias
 D.SetYear(2020) // set year to 2020
 D.SetMonth(1)

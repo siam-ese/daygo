@@ -34,6 +34,11 @@ func TestParseT(t *testing.T) {
 	if r2 == nil {
 		t.Error(f(p2))
 	}
+
+	p3 := "2021-08-03T04:44:03+00:00"
+	if parseT(p3) != nil {
+		t.Error(f(p3))
+	}
 }
 
 func TestParseList(t *testing.T) {

@@ -23,7 +23,7 @@ type D struct {
 	Second   int
 	Unix     int64
 	UnixNano int64
-	WeekDay  time.Weekday
+	Weekday  time.Weekday
 }
 
 type Unit = int
@@ -36,7 +36,7 @@ const (
 	Hour
 	Minute
 	Second
-	WeekDay
+	Weekday
 )
 
 var translator locale.Translator
@@ -54,7 +54,7 @@ func (d *D) fields() {
 	d.Hour = time.Hour()
 	d.Minute = time.Minute()
 	d.Second = time.Second()
-	d.WeekDay = time.Weekday()
+	d.Weekday = time.Weekday()
 
 	unixNano := time.UnixNano()
 	d.Unix = unixNano / 1e6
@@ -192,8 +192,8 @@ func (d *D) Set(value int, unit Unit) *D {
 		return d.change(value-d.Minute, Minute)
 	case Second:
 		return d.change(value-d.Second, Second)
-	case WeekDay:
-		return d.change(value-int(d.WeekDay), Day)
+	case Weekday:
+		return d.change(value-int(d.Weekday), Day)
 	}
 
 	return d
@@ -230,7 +230,7 @@ func (d *D) SetSecond(value int) *D {
 	return d.Set(value, Second)
 }
 func (d *D) SetWeekDay(value int) *D {
-	return d.Set(value, WeekDay)
+	return d.Set(value, Weekday)
 }
 
 // slice second after 9 bit unixnano
@@ -288,9 +288,9 @@ func (d *D) Format(t string) string {
 			unixStr := fmt.Sprint(d.Unix)
 			return unixStr[len(unixStr)-3:]
 		case "d":
-			return fmt.Sprintf("%v", int(d.WeekDay))
+			return fmt.Sprintf("%v", int(d.Weekday))
 		case "dd":
-			return translator.WT(int(d.WeekDay))
+			return translator.WT(int(d.Weekday))
 		}
 
 		return substr

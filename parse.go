@@ -12,7 +12,7 @@ var formatRe = regexp.MustCompile(`\[([^\]]+)]|Y{1,4}|M{1,4}|D{1,2}|d{1,2}|H{1,2
 func parseT(t string) []string {
 	ret := templateRe.FindStringSubmatch(t)
 
-	if len(ret) <= 0 {
+	if len(ret) <= 1 {
 		return nil
 	}
 

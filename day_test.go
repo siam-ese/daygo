@@ -12,16 +12,17 @@ import (
 func ErrorF(method string) func(...interface{}) string {
 	t := `[%s] test failed`
 	return func(vals ...interface{}) string {
-		vals = append(vals, method)
+		newVals := []interface{}{method}
+		newVals = append(newVals, vals...)
 		if len(vals) > 0 {
-			t += ",params: ("
+			t += ", params: ("
 			for i := 0; i < len(vals)-1; i++ {
-				t += "%s, "
+				t += "%v, "
 			}
 			t += ")"
 		}
 
-		return fmt.Sprintf(t, vals...)
+		return fmt.Sprintf(t, newVals...)
 	}
 }
 
@@ -111,10 +112,10 @@ func TestDaySubtract(t *testing.T) {
 }
 
 func TestDayFormat(t *testing.T) {
-	d, _ := Parse("2021-07-30 10:23:59")
+	d, _ := Parse("2021-07-30 08:08:08")
 	f := ErrorF("Day.Parse")
 	p1 := "YYYY年MM月DD日，HH时mm分ss秒"
-	if d.Format(p1) != "2021年07月30日，10时23分59秒" {
+	if d.Format(p1) != "2021年07月30日，08时08分08秒" {
 		t.Error(f(p1))
 	}
 
@@ -122,8 +123,21 @@ func TestDayFormat(t *testing.T) {
 	if d.Format(p2) != "000,July,Friday" {
 		t.Error(f(p2))
 	}
+	p3 := "YY年M月D日,d,H时m分s秒"
+	if d.Format(p3) != "21年7月30日,5,8时8分8秒" {
+		t.Error(f(p3))
+	}
+	d2, _ := Parse("2021-07-30 14:08:08")
+	p4 := "hh时h时"
+	if d2.Format(p4) != "02时2时" {
+		t.Error(f(p4))
+	}
 }
-
+func TestTime(t *testing.T) {
+	if Now().Time().Day() != time.Now().Day() {
+		t.Error("daygo Time test failed")
+	}
+}
 func TestLocale(t *testing.T) {
 	Locale(locale.ZH_CN)
 	f := ErrorF("Locale")
@@ -276,25 +290,29 @@ func TestDayEndOf(t *testing.T) {
 }
 
 func TestDaySet(t *testing.T) {
-	d, _ := Parse("2021-02-17 10:23:20")
+	d, _ := Parse("2021-02-17 10:23:20") // Wednesday
 	f := ErrorF("Day.Set")
-	if d.Set(2024, Year).Year != 2024 {
+	if d.Set(2024, Year).Year != 2024 || d.SetYear(2024).Year != 2024 {
 		t.Error(f(), "Set Year")
 	}
-	if d.Set(3, Month).Month != 3 {
+	if d.Set(3, Month).Month != 3 || d.SetMonth(3).Month != 3 {
 		t.Error(f(), "Set Month")
 	}
-	if d.Set(29, Day).Day != 1 {
+	if d.Set(29, Day).Day != 1 || d.SetDay(29).Day != 1 {
 		t.Error(f(), "Set Day")
 	}
-	if d.Set(3, Hour).Hour != 3 {
+	if d.Set(3, Hour).Hour != 3 || d.SetHour(3).Hour != 3 {
 		t.Error(f(), "Set Month")
 	}
-	if d.Set(1, Minute).Minute != 1 {
+	if d.Set(1, Minute).Minute != 1 || d.SetMinute(1).Minute != 1 {
 		t.Error(f(), "Set Minute")
 	}
-	if d.Set(59, Second).Second != 59 {
+	if d.Set(59, Second).Second != 59 || d.SetSecond(59).Second != 59 {
 		t.Error(f(), "Set Second")
+	}
+
+	if d.Set(2, Weekday).Day != 16 || d.SetWeekDay(5).Day != 19 {
+		t.Error(f(), "Set Weekday")
 	}
 }
 
@@ -346,4 +364,25 @@ func TestDayDaysInMonth(t *testing.T) {
 		t.Error(f(), "2020, 2")
 	}
 
+}
+
+func TestDayUTCAndLocal(t *testing.T) {
+	f := ErrorF("day.UTC,day.Local")
+	u := Now().UTC()
+	l := Now().Local()
+	if l.Hour-u.Hour != 8 {
+		t.Error(f())
+	}
+}
+
+func TestIntInSlice(t *testing.T) {
+	f := ErrorF("intInSlice")
+	ints := []int{1, 2, 3, 4}
+
+	if intInSlice(ints, 2) != true {
+		f(ints, 2)
+	}
+	if intInSlice(ints, 5) != false {
+		f(ints, 5)
+	}
 }
