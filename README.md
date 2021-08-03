@@ -12,7 +12,7 @@ daygo.Now().Add(1, daygo.Month).EndOf(daygo.Day).Format("YYYY-MM-DD HH:mm:ss")
 ## Installation
 
 ```console
-go get -u github.com/siam-ese/daygo@v0.1.3
+go get -u github.com/siam-ese/daygo
 ```
 
 ## Api
