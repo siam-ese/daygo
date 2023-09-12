@@ -2,7 +2,7 @@
 
 [![codecov](https://codecov.io/gh/siam-ese/daygo/branch/main/graph/badge.svg?token=2O9M92S7TL)](https://codecov.io/gh/siam-ese/daygo)
 
-A handle date-time Go library inspire for [Dayjs](https://github.com/iamkun/dayjs/)
+A Go library for handling date-time is inspired by [Dayjs](https://github.com/iamkun/dayjs/)
 
 ```go
 daygo.Now().Add(1, daygo.Month).EndOf(daygo.Day).Format("YYYY-MM-DD HH:mm:ss")
